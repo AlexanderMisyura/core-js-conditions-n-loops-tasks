@@ -351,8 +351,35 @@ function rotateMatrix(/* matrix */) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+
+function sortByAsc(arr) {
+  function partitionArray(array, left, right) {
+    const myArray = array;
+    const pivotElement = myArray[right];
+    let i = left - 1;
+
+    for (let j = left; j <= right - 1; j += 1) {
+      if (myArray[j] < pivotElement) {
+        i += 1;
+        [myArray[i], myArray[j]] = [myArray[j], myArray[i]];
+      }
+    }
+
+    [myArray[i + 1], myArray[right]] = [myArray[right], myArray[i + 1]];
+
+    return i + 1;
+  }
+
+  function quickSort(array, left = 0, right = array.length - 1) {
+    if (left < right) {
+      const newPivotIndex = partitionArray(array, left, right);
+      quickSort(array, left, newPivotIndex - 1);
+      quickSort(array, newPivotIndex + 1, right);
+    }
+  }
+
+  quickSort(arr);
+  return arr;
 }
 
 /**
@@ -393,8 +420,60 @@ function shuffleChar(/* str, iterations */) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function createArrayFromNumber(n) {
+  const string = `${n}`;
+  const resultArray = [];
+  for (let i = 0; i < string.length; i += 1) {
+    resultArray[i] = Number(string[i]);
+  }
+  return resultArray;
+}
+function sliceArray(array, start, stop) {
+  const resultArray = [];
+  for (let i = start, j = 0; i < stop; i += 1, j += 1) {
+    resultArray[j] = array[i];
+  }
+  return resultArray;
+}
+function joinArray(array, separator = ',') {
+  let resultString = '';
+  for (let i = 0; i < array.length; i += 1) {
+    if (i === array.length) {
+      resultString += `${array[i]}`;
+    } else {
+      resultString = `${resultString}${array[i]}${separator}`;
+    }
+  }
+
+  return resultString;
+}
+
+function getNearestBigger(number) {
+  const arr = createArrayFromNumber(number);
+  let threshold = arr.length - 1;
+  let swappable;
+  for (let i = arr.length - 1; i >= 1; i -= 1) {
+    if (arr[i - 1] < arr[i]) {
+      threshold = i;
+      swappable = arr[threshold - 1];
+      let min = i;
+
+      for (let j = threshold; j < arr.length; j += 1) {
+        if (swappable < arr[j] && arr[j] < arr[min]) {
+          min = j;
+        }
+      }
+
+      [arr[threshold - 1], arr[min]] = [arr[min], arr[threshold - 1]];
+      break;
+    }
+  }
+
+  const rightPart = sliceArray(arr, threshold, arr.length);
+  const leftPart = sliceArray(arr, 0, threshold);
+  sortByAsc(rightPart);
+
+  return Number(joinArray([...leftPart, ...rightPart], ''));
 }
 
 module.exports = {
